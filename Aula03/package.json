@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "better-sqlite3": "^12.6.2",
+    "express": "^5.2.1",
+    "mysql2": "^3.19.1",
+    "path": "^0.12.7",
+    "sequelize": "^6.37.8"
+  }
+}
