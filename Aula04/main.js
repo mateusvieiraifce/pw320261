@@ -55,6 +55,23 @@ const Fornecedor = sequelize.define("Fornecedor", {
         }
 })
 
+const Cliente = sequelize.define("Cliente",{
+    id: { type: DataTypes.INTEGER,
+           primaryKey:true,
+           autoIncrement:true
+        },
+    nome:{ type:DataTypes.STRING(100),
+            allowNull:false,
+        },
+    endereco:{ type:DataTypes.STRING(100),
+            allowNull:false,
+        },
+    telefone:{ type:DataTypes.STRING(20),
+            allowNull:false,
+        }
+});
+
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 
@@ -260,6 +277,84 @@ app.post("/produto/update/:id", async (req,res)=>{
         res.status(404).send( {mg:error}, 404)
     }   
 })
+
+app.post('/cliente/create', async (req, res) => {
+    try {
+        const { nome, endereco, telefone } = req.body;
+
+        const user = await Cliente.create({
+            nome,
+            endereco,
+            telefone
+        });
+
+        return res.status(201).send({
+            msg: "cliente criado com sucesso",
+            user
+        });
+
+    } catch (error) {
+        return res.status(500).send({
+            msg: "erro interno",
+            error: error.message
+        });
+    }
+});
+
+app.get("/cliente/all", async (req, res)=>{
+
+    const all = await Cliente.findAll();
+    return res.send( {clientes:all}, 200)
+});
+
+app.get("/cliente/byid/:id", async (req, res)=>{
+
+    const { id } = req.params
+
+    const cliente = await Cliente.findByPk(id);
+
+    if (!cliente) {
+        return res.status(404).send( {mg:"cliente não encontrado"}, 404)
+    }
+
+    return res.send( {clientes:cliente}, 200)
+})
+
+app.get("/cliente/delete/:id", async (req, res)=>{
+
+    try {
+        const { id } = req.params
+
+        const cliente = await Cliente.findByPk(id);
+        
+        if (!cliente) {
+            return res.status(404).send( {mg:"cliente não encontrado"}, 404)
+        }
+        await cliente.destroy();
+
+    return res.send( {mg:"cliente deletado com sucesso"}, 204)}catch(error){
+        return res.status(404).send( {mg:error}, 404)
+    }
+})
+
+app.post('/cliente/update/:id', async (req,res)=>{
+    //console.log(nome);
+    try {
+        const { id } = req.params;
+        const clientev = await Cliente.findByPk(id);
+        
+        if (!clientev) {
+            return res.status(404).send( {mg:"cliente não encontrado"});
+        }
+        const { nome, endereco, telefone} = req.body;
+        const cliente = await clientev.update({ nome:nome, endereco:endereco, telefone:telefone}, 
+        { where: { id: id } });
+    res.send( {mg:"salvo com sucesso", cliente:cliente}, 200)
+    }catch(error){
+        //console.log(error)
+        res.status(404).send( {mg:error}, 404)
+    }
+} )
 
 app.listen(3000,()=>{
 
