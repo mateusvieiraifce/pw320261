@@ -32,7 +32,7 @@ app.delete("/fornecedor/delete/:id", fornecedorController.delete);
 app.put("/fornecedor/:id", fornecedorController.update);
 
 app.post('/produto/create', produtoController.create)
-app.get("/produto/all", ´produtoController.findAll)
+app.get("/produto/all", produtoController.findAll)
 app.get("/produto/byid/:id", produtoController.findById)
 app.get("/produto/delete/:id",produtoController.delete)
 app.post("/produto/update/:id", produtoController.upadate)
