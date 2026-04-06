@@ -20,19 +20,6 @@ const Produto = sequelize.define("Produto",{
         }
 });
 
-const Fornecedor = sequelize.define("Fornecedor", {
-    id: { type: DataTypes.INTEGER,
-           primaryKey:true,
-           autoIncrement:true
-        },
-    nome:{ type:DataTypes.STRING(100),
-            allowNull:false,
-        },
-    cnpj:{ type:DataTypes.STRING(100),
-            allowNull:false,
-        }
-})
-
 const Cliente = sequelize.define("Cliente",{
     id: { type: DataTypes.INTEGER,
            primaryKey:true,
@@ -78,45 +65,13 @@ app.get("/user/delete/:id", userController.delete)
 app.post('/user/update/:id', userController.update )
 
 //FORNECEDOR
-app.post("/fornecedor/create", async (req,res)=>{
-     
-    const { nome, cnpj } = req.body;
-    try {
-    const fornecedor = await Fornecedor.create({ nome:nome, cnpj:cnpj})
-    res.send( {mg:"chegou", fornecedor:fornecedor}, 200)
-    }catch(error){
-        console.log(error)
-    }
-    res.send( {mg:"error"}, 200)
-} )
+const fornecedorController = require("./controllers/FornecedorController")
 
-app.get("/fornecedor/all", async (req, res)=>{
-
-    const all = await Fornecedor.findAll();
-    return res.send( {fornecedor:all}, 200)
-})
-
-app.get("/fornecedor/all/:id", async (req, res)=>{
-
-    const { id } = req.params
-
-    const all = await Fornecedor.findByPk(id);
-    return res.send( {fornecedor:all}, 200)
-})
-
-app.delete("/fornecedor/delete/:id", async (req, res) => {
-    try {
-        const { id } = req.params;
-        const fornecedor = await Fornecedor.findByPk(id);
-
-        if (!fornecedor) {
-            return res.status(404).send({mg: "Fornecedor não encontrado"}, 404)
-        }
-        await fornecedor.destroy();
-        return res.send({mg: "Fornecedor deletado com sucesso"}, 204)
-    }catch(error) {}});
-
-
+app.post("/fornecedor/create", fornecedorController.create);
+app.get("/fornecedor/all", fornecedorController.getAll);
+app.get("/fornecedor/:id", fornecedorController.getById);
+app.delete("/fornecedor/delete/:id", fornecedorController.delete);
+app.put("/fornecedor/:id", fornecedorController.update);
 
 app.post('/produto/create', async (req,res)=>{
     //console.log(nome)
@@ -167,25 +122,6 @@ app.get("/produto/delete/:id", async (req,res)=>{
         return res.status(404).send( {mg:error}, 404)
     }
 })
-
-app.post("/fornecedor/update/:id", async (req, res) => {
-    try {
-        const { id } = req.params;
-        const fornecedor = await Fornecedor.findByPk(id);
-
-        if (!fornecedor) {
-            return res.status(404).send({mg: "Fornecedor não encontrado"}, 404)
-        }
-
-        const { nome, cnpj } = req.body;
-        const fornecedor_update = await fornecedor.update(
-            { nome: nome, cnpj: cnpj}, {where: { id: id}}
-        );
-        res.send({ mg: "Alterado com sucesso", fornecedor_update:fornecedor_update}, 200)
-    }catch(error){
-        res.status(404).send({mg:error}, 404)
-    }}
-);
 app.post("/produto/update/:id", async (req,res)=>{
     //console.log(nome);
     try {
