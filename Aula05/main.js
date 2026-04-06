@@ -2,43 +2,6 @@ const express = require('express')
 const app = express();
 const {DataTypes} = require('sequelize');
 const {sequelize} = require('./config/index');
-const Usuario = require('./models/Usuario');
-const TipoProduto = require('./models/TipoProduto');
-
-const Produto = sequelize.define("Produto",{
-    id: { type: DataTypes.INTEGER,
-           primaryKey:true,
-           autoIncrement:true
-        },
-    nome:{ type:DataTypes.STRING(100),
-            allowNull:false,
-        },
-    preco:{ type:DataTypes.FLOAT,
-            allowNull:false,
-        },
-    descricao:{ type:DataTypes.STRING(100),
-            allowNull:false,
-        }
-});
-
-const Cliente = sequelize.define("Cliente",{
-    id: { type: DataTypes.INTEGER,
-           primaryKey:true,
-           autoIncrement:true
-        },
-    nome:{ type:DataTypes.STRING(100),
-            allowNull:false,
-        },
-    endereco:{ type:DataTypes.STRING(100),
-            allowNull:false,
-        },
-    telefone:{ type:DataTypes.STRING(20),
-            allowNull:false,
-        }
-});
-
-
-
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
@@ -50,6 +13,10 @@ app.get('/',(req,res)=>{
 
 const userController = require("./controllers/UsuarioController");
 const tipoController = require("./controllers/TipoProdutoController");
+const produtoController = require("./controllers/ProdutoController");
+const fornecedorController = require("./controllers/FornecedorController")
+const clienteController = require("./controllers/ClienteController")
+
 
 app.post('/user/create', userController.create)
 app.get("/user/all", userController.findAll);
@@ -58,173 +25,25 @@ app.get("/user/delete/:id", userController.delete)
 app.post('/user/update/:id', userController.update )
 
 //FORNECEDOR
-const fornecedorController = require("./controllers/FornecedorController")
-
 app.post("/fornecedor/create", fornecedorController.create);
 app.get("/fornecedor/all", fornecedorController.getAll);
 app.get("/fornecedor/:id", fornecedorController.getById);
 app.delete("/fornecedor/delete/:id", fornecedorController.delete);
 app.put("/fornecedor/:id", fornecedorController.update);
 
-app.post('/produto/create', async (req,res)=>{
-    //console.log(nome)
-    try {
-        const {nome, preco, descricao} = req.body;
-        const produto = await Produto.create({nome:nome, preco:preco, descricao:descricao})
-    res.send( {mg:"salvo com sucesso", produto:produto}, 200)
-    }catch(error){
-        console.log(error)
-        res.send( {mg:error}, 404)
-    }
-   // res.send( {mg:"error",}, 200)
-})
+app.post('/produto/create', produtoController.create)
+app.get("/produto/all", ´produtoController.findAll)
+app.get("/produto/byid/:id", produtoController.findById)
+app.get("/produto/delete/:id",produtoController.delete)
+app.post("/produto/update/:id", produtoController.upadate)
 
-app.get("/produto/all", async (req,res)=>{
+app.post('/cliente/create', clienteController.create);
+app.get("/cliente/all",clienteController.findAll);
+app.get("/cliente/byid/:id", clienteController.findById);
+app.get("/cliente/delete/:id", clienteController.delete)
+app.post('/cliente/update/:id', clienteController.update )
 
-    const all = await Produto.findAll();
-    return res.send( {produtos:all}, 200)
-    
-})
-
-app.get("/produto/byid/:id", async (req,res)=>{
-
-    const { id } = req.params
-
-    const produto = await Produto.findByPk(id);
-
-    if (!produto) {
-        return res.status(404).send( {mg:"produto não encontrado"}, 404)
-    }
-
-    return res.send( {produtos:produto}, 200)
-})
-
-app.get("/produto/delete/:id", async (req,res)=>{
-    
-    try {
-        const { id } = req.params
-
-        const produto = await Produto.findByPk(id);
-
-        if (!produto) {
-        return res.status(404).send( {mg:"produto não encontrado"}, 404)
-        }
-        await produto.destroy();
-    
-    return res.send( {mg:"produto deletado com sucesso"}, 204)}catch(error){
-        return res.status(404).send( {mg:error}, 404)
-    }
-})
-app.post("/produto/update/:id", async (req,res)=>{
-    //console.log(nome);
-    try {
-        const { id } = req.params;
-        const produto = await Produto.findByPk(id);
-
-        if (!produto) {
-            return res.status(404).send( {mg:"produto não encontrado"});
-        }
-        const { nome, preco, descricao} = req.body;
-        const pd = await produto.update({nome:nome, preco:preco, descricao:descricao},{ where: {id:id} });
-    res.send( {mg:"salvo com sucesso", produto:produto}, 200)
-    }catch(error){
-        console.log(error)
-        res.status(404).send( {mg:error}, 404)
-    }   
-})
-
-app.post('/cliente/create', async (req, res) => {
-    try {
-        const { nome, endereco, telefone } = req.body;
-
-        const user = await Cliente.create({
-            nome,
-            endereco,
-            telefone
-        });
-
-        return res.status(201).send({
-            msg: "cliente criado com sucesso",
-            user
-        });
-
-    } catch (error) {
-        return res.status(500).send({
-            msg: "erro interno",
-            error: error.message
-        });
-    }
-});
-
-app.get("/cliente/all", async (req, res)=>{
-
-    const all = await Cliente.findAll();
-    return res.send( {clientes:all}, 200)
-});
-
-app.get("/cliente/byid/:id", async (req, res)=>{
-
-    const { id } = req.params
-
-    const cliente = await Cliente.findByPk(id);
-
-    if (!cliente) {
-        return res.status(404).send( {mg:"cliente não encontrado"}, 404)
-    }
-
-    return res.send( {clientes:cliente}, 200)
-})
-
-app.get("/cliente/delete/:id", async (req, res)=>{
-
-    try {
-        const { id } = req.params
-
-        const cliente = await Cliente.findByPk(id);
-        
-        if (!cliente) {
-            return res.status(404).send( {mg:"cliente não encontrado"}, 404)
-        }
-        await cliente.destroy();
-
-    return res.send( {mg:"cliente deletado com sucesso"}, 204)}catch(error){
-        return res.status(404).send( {mg:error}, 404)
-    }
-})
-
-app.post('/cliente/update/:id', async (req,res)=>{
-    //console.log(nome);
-    try {
-        const { id } = req.params;
-        const clientev = await Cliente.findByPk(id);
-        
-        if (!clientev) {
-            return res.status(404).send( {mg:"cliente não encontrado"});
-        }
-        const { nome, endereco, telefone} = req.body;
-        const cliente = await clientev.update({ nome:nome, endereco:endereco, telefone:telefone}, 
-        { where: { id: id } });
-    res.send( {mg:"salvo com sucesso", cliente:cliente}, 200)
-    }catch(error){
-        //console.log(error)
-        res.status(404).send( {mg:error}, 404)
-    }
-} )
-
-app.post('/tipoproduto/create', async (req,res)=>{
-    //console.log(nome);
-    try {
-        const { descricao} = req.body;
-        const user = await TipoProduto.create({ descricao:descricao
-        })
-    res.send( {mg:"salvo com sucesso", TipoProduto:user}, 200)
-    }catch(error){
-        //console.log(error)
-        res.send( {mg:error}, 404)
-    }
-    res.send( {mg:"error",}, 200)
-} )
-
+app.post('/tipoproduto/create',tipoController.create)
 app.get("/tipoproduto/all",tipoController.findAll)
 app.get("/tipoproduto/byid/:id",tipoController.findByid)
 app.get("/tipoproduto/delete/:id", tipoController.delete)
