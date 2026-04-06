@@ -3,6 +3,7 @@ const app = express();
 const {DataTypes} = require('sequelize');
 const {sequelize} = require('./config/index');
 const Usuario = require('./models/Usuario');
+const TipoProduto = require('./models/TipoProduto');
 
 const Produto = sequelize.define("Produto",{
     id: { type: DataTypes.INTEGER,
@@ -36,16 +37,7 @@ const Cliente = sequelize.define("Cliente",{
         }
 });
 
-const TipoProduto = sequelize.define("TipoProduto",{
-    id: { type: DataTypes.INTEGER,
-           primaryKey:true,
-           autoIncrement:true
-        },
-      
-    descricao:{ type:DataTypes.STRING(100),
-            allowNull:false,
-        }
-});
+
 
 
 app.use(express.json())
@@ -57,6 +49,7 @@ app.get('/',(req,res)=>{
 } )
 
 const userController = require("./controllers/UsuarioController");
+const tipoController = require("./controllers/TipoProdutoController");
 
 app.post('/user/create', userController.create)
 app.get("/user/all", userController.findAll);
@@ -232,58 +225,10 @@ app.post('/tipoproduto/create', async (req,res)=>{
     res.send( {mg:"error",}, 200)
 } )
 
-app.get("/tipoproduto/all", async (req, res)=>{
-
-    const all = await TipoProduto.findAll();
-    return res.send( {TipoProduto:all}, 200)
-})
-app.get("/tipoproduto/byid/:id", async (req, res)=>{
-
-    const { id } = req.params
-
-    const user = await TipoProduto.findByPk(id);
-
-    if (!user) {
-        return res.status(404).send( {mg:"usuario não encontrado"}, 404)
-    }
-
-    return res.send( {TipoProduto:user}, 200)
-})
-
-app.get("/tipoproduto/delete/:id", async (req, res)=>{
-
-    try {
-        const { id } = req.params
-
-        const user = await TipoProduto.findByPk(id);
-        
-        if (!user) {
-            return res.status(404).send( {mg:"produto não encontrado"}, 404)
-        }
-        await user.destroy();
-
-    return res.send( {mg:"usuario deletado com sucesso"}, 204)}catch(error){
-        return res.status(404).send( {mg:error}, 404)
-    }
-})
-
-app.post('/tipoproduto/update/:id', async (req,res)=>{
-    //console.log(nome);
-    try {
-        const { id } = req.params;
-        const userv = await TipoProduto.findByPk(id);
-        
-        if (!userv) {
-            return res.status(404).send( {mg:"tipo  não encontrado"});
-        }
-        const { descricao } = req.body;
-        const user = await userv.update({ descricao}, { where: { id: id } });
-    res.send( {mg:"salvo com sucesso", user:user}, 200)
-    }catch(error){
-        //console.log(error)
-        res.status(404).send( {mg:error}, 404)
-    }
-} )
+app.get("/tipoproduto/all",tipoController.findAll)
+app.get("/tipoproduto/byid/:id",tipoController.findByid)
+app.get("/tipoproduto/delete/:id", tipoController.delete)
+app.post('/tipoproduto/update/:id', tipoController.update)
 
 app.listen(3000,()=>{
 
