@@ -18,11 +18,13 @@ const fornecedorController = require("./controllers/FornecedorController")
 const clienteController = require("./controllers/ClienteController")
 
 
-app.post('/user/create', userController.create)
-app.get("/user/all", userController.findAll);
-app.get("/user/byid/:id", userController.findById)
-app.get("/user/delete/:id", userController.delete)
-app.post('/user/update/:id', userController.update )
+app.post('/v1/usuario/create', userController.create)
+app.get("/v1/usuario/all", userController.findAll);
+app.get("/v1/usuario/byid/:id", userController.findById)
+app.delete("/v1/usuario/delete/:id", userController.delete)
+app.put('/v1/usuario/update/:id', userController.update )
+app.post('/v1/usuario/findbyparam', userController.findByParm)
+
 
 //FORNECEDOR
 app.post("/fornecedor/create", fornecedorController.create);
