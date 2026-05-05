@@ -6,6 +6,15 @@ const jwt = require('jsonwebtoken')
 const brcypt = require('bcrypt')
 const SECRET = "pw32026"
 
+const cors = require('cors')
+
+app.use(cors({
+    origin:'*',
+    methods:['GET','POST','PUT','DELETE'],
+    allowedHeaders:['Content-Type','Authorization']
+
+}));
+
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 
