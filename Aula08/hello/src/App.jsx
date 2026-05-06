@@ -18,26 +18,36 @@ function App() {
       };
  
    
-   const response = await fetch('http://dig-huntress-arming.ngrok-free.dev/v1/usuario/login',
+   const response = await fetch('/v1/usuario/login',
   {
       method: 'POST', // Define o método como POST
      // mode:"no-cors",
       headers: {
-        
         'Content-Type': 'application/json', // Avisa o servidor que estamos enviando JSON
-        'ngrok-skip-browser-warning': '69420' // Necessário se estiver usando o plano gratuito do ngrok
+         // Necessário se estiver usando o plano gratuito do ngrok
       },
       body: JSON.stringify({ "email": nome, "senha": senha }) 
   } 
-  ).catch((e)=>{
-    console.log(e);
+  ).catch( (e)  => {
+    console.error('Erro na requisição:', e);
+    const resp =  e.response;
+    console.log(resp.ms);
   })
-   if (response){
-      console.log(response)
+  //console.log(response);
+   if (response.ok){
+    console.log("Requisição bem-sucedida!");
+    const data = await response.json();
+      console.log(data.token);
    }
+   if (response.status === 404) {
+  //  console.error('Erro na resposta:', response.status, response.statusText);
+    const errorData = await response.json();
+    alert('Erro: ' + errorData.ms);
+    //console.error('Detalhes do erro:', errorData.ms);
+  }
 
     ///chamar o back end
-    alert(nome + senha)
+    //alert(nome + senha)
   }
 
   return (
