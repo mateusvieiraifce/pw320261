@@ -10,7 +10,7 @@ export default defineConfig({
       // Quando você fizer uma requisição para '/v1/exemplo'
       // o Vite vai redirecionar para 'https://ngrok-free.dev'
       '/v1': {
-        target: 'http://localhost:3000',
+        target: 'http://dig-huntress-arming.ngrok-free.dev',
         headers: {
           'ngrok-skip-browser-warning': 'true'
         },
