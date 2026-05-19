@@ -7,14 +7,18 @@ import './App.css'
 import './Dash.css'
 import { Link } from 'react-router'
 import Menu from './Menu'
+import { useEffect } from 'react'
 
-function User() {
+function User( setUser) {
   
+  useEffect(() => {
+    console.log("User")
+  }, [  ])
 
   return (
     <>
     <div className='top'  >
-     <Menu/>
+     <Menu page={"Users"}/>
       <div className='layout'>
           <h1> Create User</h1>  
 

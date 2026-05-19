@@ -6,17 +6,18 @@ import {TextField}  from '@mui/material'
 import './App.css'
 import { Link } from 'react-router'
 
-function Menu() {
-  
+function Menu( {page} ) {
+  function setMenu(pag){
+  }
 
   return (
     <>
    
       <div className='sidebar' style={{ width:"200px" }}>
         <h2>Menu</h2>
-        <Link to="/">Login</Link>
-        <Link to="/dashboard" >Dashboard</Link>
-         <Link to="/user/create" >User</Link>
+        <Link to="/" onClick="/"  onClick={setMenu} >Login</Link>
+        <Link to="/dashboard" className={page === "Dashboard" ? "active" : ""}>Dashboard</Link>
+         <Link to="/user/create"  className={page === "Users" ? "active" : ""} onClick={() => setUser("Users")}>User</Link>
       </div>
    
     </>
