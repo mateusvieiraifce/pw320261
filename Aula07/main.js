@@ -66,7 +66,7 @@ const clienteController = require("./controllers/ClienteController")
 
 app.post('/v1/usuario/login', userController.login)
 app.post('/v1/usuario/create', userController.create)
-app.get("/v1/usuario/all", verificaToken, userController.findAll);
+app.get("/v1/usuario/all",  userController.findAll);
 app.get("/v1/usuario/byid/:id", userController.findById)
 app.delete("/v1/usuario/delete/:id", userController.delete)
 app.put('/v1/usuario/update/:id', userController.update )

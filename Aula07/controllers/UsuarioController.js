@@ -133,6 +133,7 @@ exports.update = async (req, res) => {
     try {
         const { id } = req.params;
         const userv = await Usuario.findByPk(id);
+       
 
         if (!userv) {
             return res.status(404).send({ mg: "usuario não encontrado" });
