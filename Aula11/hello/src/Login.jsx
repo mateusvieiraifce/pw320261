@@ -5,6 +5,7 @@ import heroImg from './assets/hero.png'
 import {TextField}  from '@mui/material'
 import './App.css'
 import { Link, useNavigate } from 'react-router'
+import api from './service/api'
 
 function Login() {
   const navigate = useNavigate();
@@ -20,28 +21,28 @@ function Login() {
       };
  
    
-   const response = await fetch('/v1/usuario/login',
-  {
-      method: 'POST', // Define o método como POST
-     // mode:"no-cors",
-      headers: {
-        'Content-Type': 'application/json',
-        "ngrok-skip-browser-warning": "1" // Avisa o servidor que estamos enviando JSON
-         // Necessário se estiver usando o plano gratuito do ngrok
-      },
-      body: JSON.stringify({ "email": nome, "senha": senha }) 
-  } 
-  ).catch( (e)  => {
+   const response = await api.post('/usuario/login',
+    JSON.stringify({ "email": nome, "senha": senha }) 
+   
+  ).then((response)=>{
+    console.log(response);
+    console.log(response.data.token);
+     navigate("/dashboard")
+  }).catch( (e)  => {
     console.error('Erro na requisição:', e);
-    const resp =  e.response;
-    console.log(resp.ms);
+    const resp =  e
+    if (resp.response && resp.response.data && resp.response.data.ms) {
+      alert('Erro: ' + resp.response.data.ms);
+    } else {
+      alert('Ocorreu um erro desconhecido.');
+    }
+    console.log(resp.response.data.ms);
   })
-  //console.log(response);
-   if (response.ok){
+  /*console.log(response);
+   if (response.status === 200) {
     console.log("Requisição bem-sucedida!");
     const data = await response.json();
-      console.log(data.token);
-     navigate("/dashboard")
+      
    }
    if (response.status === 404) {
   //  console.error('Erro na resposta:', response.status, response.statusText);
@@ -51,7 +52,7 @@ function Login() {
   }
 
     ///chamar o back end
-    //alert(nome + senha)
+    //alert(nome + senha)(+*/
   }
 
   return (
