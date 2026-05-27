@@ -2,10 +2,12 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
-import { Alert, Icon, IconButton, TextField } from '@mui/material'
-import DeleteIcon  from '@mui/icons-material/Delete';
-import EditIcon  from '@mui/icons-material/Edit';
-import SaveIcon  from '@mui/icons-material/Save';
+import { Alert, Icon, IconButton, TextField, Button, Modal, Typography } from '@mui/material'
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import SaveIcon from '@mui/icons-material/Save';
+import AddIcon from '@mui/icons-material/Add';
+import SearchIcon from '@mui/icons-material/Search';
 import './App.css'
 import './Dash.css'
 import { Form, Link } from 'react-router'
@@ -25,10 +27,10 @@ import Stack from '@mui/material/Stack';
 
 function User(setUser) {
 
- 
+
   const handleChange = (event, value) => {
     setPage(value);
-    
+
   };
 
   const [list, setList] = useState([])
@@ -38,8 +40,37 @@ function User(setUser) {
   const [id, setId] = useState(null)
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
+  const [open, setOpen] = useState(false);
+  const [pesquisa, setPesquisa] = useState(false)
 
 
+  function handleOpen() {
+    setId(null)
+    setName("")
+    setEmail("")
+    setSenha("")
+    setOpen(true);
+  }
+  function handleOpenPesquisa() {
+    setPesquisa(true);
+  }
+
+  function handleClose() {
+    setOpen(false);
+  }
+  function handleClosePesquisa() {
+    setPesquisa(false);
+  }
+
+  async function loadUser() {
+  }
+
+  function handleClose() {
+    setOpen(false);
+  }
+  function handleClosePesquisa() {
+    setPesquisa(false);
+  }
 
   async function loadUser() {
     const filter = {
@@ -48,7 +79,7 @@ function User(setUser) {
       email: email
     }
 
-    const result = await api.post("/usuario/findbyparam",filter).then(
+    const result = await api.post("/usuario/findbyparam", filter).then(
       (res) => {
         setList(res.data.usuarios)
         setTotal(res.data.total)
@@ -57,6 +88,12 @@ function User(setUser) {
       }
     )
 
+  }
+  function limpaCampos() {
+    setEmail("")
+    setName("")
+    setSenha("")
+    setId(null)
   }
 
   useEffect(() => {
@@ -71,7 +108,7 @@ function User(setUser) {
       senha: senha,
       mensagem: "vazlio"
     };
-    console.log(user);
+    // console.log(user);
 
     let url = "/usuario/create"
     if (id == null) {
@@ -92,6 +129,7 @@ function User(setUser) {
           alert("aqui");
 
           if (response.status == 200) {
+
             loadUser()
 
           }
@@ -133,8 +171,7 @@ function User(setUser) {
       setName(usera.nome)
       setSenha(usera.senha)
       setId(usera.id)
-
-
+      setOpen(true);
     }).catch((error) => {
 
 
@@ -150,41 +187,16 @@ function User(setUser) {
         <Menu page={"Users"} />
         <div className='layout' style={{ display: 'flex', flexDirection: 'column', width: '90%', marginRight: '20px', marginLeft: '20px', marginBottom: '20px' }}>
           <h1>Usuários</h1>
+          <Box sx={{ width: '100%', marginTop: 2, alignItems: "right", display: "flex", justifyContent: "left" }}>
+            <Button onClick={handleOpen}>
+              <AddIcon aria-label="delete" size="small">
+              </AddIcon>
+            </Button>
 
-          <Box sx={{ height: 280, width: '98%', border: '1px solid black', padding: 2, marginRight:40 }}>
-
-            <form onSubmit={saveUser}>
-              <TextField id="login" label="Email" onChange={(e) => {
-                setEmail(e.target.value)
-              }} required type="email" style={{ marginBottom: 10 }}
-                value={email} ></TextField>
-              <br></br>
-              <TextField id="login" label="Nome" onChange={(e) => {
-                setName(e.target.value)
-              }} required type="text" style={{ marginBottom: 10 }} value={name}
-              ></TextField>
-
-              <br></br>
-              <TextField id="login" label="Senha" required onChange={(e) => {
-                setSenha(e.target.value)
-              }} type="password" style={{ marginBottom: 10 }} value={senha}
-              ></TextField>
-
-              <input type='hidden' name="id" value={id} />
-
-              <br></br>
-
-              <button
-                type="submit"
-                className="counter"
-              >
-                Salvar
-                <IconButton aria-label="delete" size="small">
-                  <SaveIcon />
-                </IconButton>
-              </button>
-
-            </form>
+            <Button onClick={handleOpenPesquisa} >
+              <SearchIcon aria-label="delete" size="small">
+              </SearchIcon>
+            </Button>
           </Box>
           <Box sx={{ width: '100%', border: '1px solid black', marginTop: 2 }}>
             <TableContainer component={Paper}>
@@ -224,13 +236,86 @@ function User(setUser) {
               </Table>
             </TableContainer>
           </Box>
-          <Pagination count={Math.ceil(total/5)} onChange={handleChange}/>
+          <Pagination count={Math.ceil(total / 5)} onChange={handleChange} />
 
 
         </div>
 
       </div>
 
+
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', border: '2px solid #000', boxShadow: 24, p: 4 }}>
+          <Box sx={{ height: 280, width: '98%', border: '1px solid black', padding: 2, marginRight: 40 }}>
+
+            <form onSubmit={saveUser}>
+              <TextField id="login" label="Email" onChange={(e) => {
+                setEmail(e.target.value)
+              }} required type="email" style={{ marginBottom: 10 }}
+                value={email} ></TextField>
+              <br></br>
+              <TextField id="login" label="Nome" onChange={(e) => {
+                setName(e.target.value)
+              }} required type="text" style={{ marginBottom: 10 }} value={name}
+              ></TextField>
+
+              <br></br>
+              <TextField id="login" label="Senha" required onChange={(e) => {
+                setSenha(e.target.value)
+              }} type="password" style={{ marginBottom: 10 }} value={senha}
+              ></TextField>
+
+              <input type='hidden' name="id" value={id} />
+
+              <br></br>
+
+              <button
+                type="submit"
+                className="counter"
+              >
+                Salvar
+                <IconButton aria-label="delete" size="small">
+                  <SaveIcon />
+                </IconButton>
+              </button>
+            </form>
+          </Box>
+        </Box>
+      </Modal>
+
+       <Modal
+        open={pesquisa}
+        onClose={handleClosePesquisa}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+        border="1px solid black"
+      >
+        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', border: '2px solid #000', boxShadow: 24, p: 4, flexDirection: "column", display: "flex", alignItems: "center" }}>
+              <div style={{ width: '98%', padding: 2 }}>
+            <form onSubmit={saveUser}>
+              <TextField id="login" label="Email" onChange={(e) => {
+                setEmail(e.target.value)
+              }} required type="email" style={{ marginBottom: 10 }}
+                value={email} sx={{ width: '100%' }} ></TextField>
+              <br></br>
+              <TextField id="login" label="Nome" onChange={(e) => {
+                setName(e.target.value)
+              }} required type="text" style={{ marginBottom: 10 }} value={name} sx={{ width: '100%' }}
+              ></TextField>
+              <div style={{ display: "flex", flexDirection: "row", justifyContent: "right", width: "100%" }}>
+                <IconButton aria-label="delete" size="small" onClick={loadUser}>
+                  <SearchIcon />
+                </IconButton>
+              </div>
+            </form>
+          </div>
+        </Box>
+      </Modal>
     </>
   )
 }
