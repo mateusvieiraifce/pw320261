@@ -69,7 +69,10 @@ exports.findByParm = async (req, res) => {
             limit: parseInt(limit),
             offset: parseInt(offset)
         });
-        return res.send({ usuarios: all }, 200)
+
+        const total = await Usuario.count({ where: where });
+        
+        return res.send({ usuarios: all, total: total }, 200)
     } catch (error) {
         console.log(error)
         return res.status(400).send({ mg: "Erro no banco de dados" }, 400)
